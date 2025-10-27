@@ -9,6 +9,14 @@ public class BarraProgreso {
 	private int max;
 	private int valorActual;
 	
+	// Constructor vacío
+	public BarraProgreso() {
+		this.nombre = "Barra 0";
+		this.min = this.valorActual = MIN;
+		this.max = MAX;
+	}
+	
+	// Constructor parametrizado
 	public BarraProgreso(String nombre) {
 		this.nombre = nombre;
 		this.min = this.valorActual = MIN;
