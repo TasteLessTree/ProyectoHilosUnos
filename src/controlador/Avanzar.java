@@ -4,24 +4,24 @@ import javax.swing.JProgressBar;
 
 public class Avanzar extends Thread {
 	public JProgressBar barra;
-	private boolean vivo;
+	private boolean avanzar;
 	
 	public Avanzar(JProgressBar JPB) {
 		this.barra = JPB;
-		this.vivo = false;
+		this.avanzar = false;
 	}
 	
 	public boolean isVivo() {
-		return vivo;
+		return avanzar;
 	}
 
 	public void setVivo(boolean alive) {
-		this.vivo = alive;
+		this.avanzar = alive;
 	}
 
 	@Override
 	public void run() {
-		this.vivo = true;
+		avanzar = true;
 		barra.setStringPainted(true);
 		
 		for (int i = barra.getMinimum(); i <= barra.getMaximum(); i++) {
@@ -33,5 +33,7 @@ public class Avanzar extends Thread {
 				e.printStackTrace();
 			}
 		}
+		
+		avanzar = false;
 	}
 }

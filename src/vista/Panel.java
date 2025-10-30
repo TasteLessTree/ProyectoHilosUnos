@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 import java.util.Random;
 
 import javax.swing.JButton;
@@ -15,6 +16,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
 import controlador.Avanzar;
+import modelo.BarraProgreso;
 
 import javax.swing.JProgressBar;
 
@@ -24,6 +26,7 @@ public class Panel extends JFrame {
 	private JPanel contentPane;
 	private JButton btnSalir, btnAvanzar1, btnAvanzar2, btnALaVez;
 	private JProgressBar pbAvance1, pbAvance2;
+	private Avanzar AvanzarBarra1 = null, AvanzarBarra2 = null;
 
 	/**
 	 * Launch the application.
@@ -71,17 +74,17 @@ public class Panel extends JFrame {
 		btnAvanzar1 = new JButton("Avanzar");
 		btnAvanzar1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Thread AvanzarBarra1 = new Avanzar(pbAvance1);
-				AvanzarBarra1.start();
-				btnAvanzar1.setEnabled(false);
-				btnALaVez.setEnabled(false);
-				
-				if (AvanzarBarra1.isAlive()) {
-					btnAvanzar1.setEnabled(false);
-					btnALaVez.setEnabled(false);
-				} else {
-					btnAvanzar1.setEnabled(true);
-					btnALaVez.setEnabled(true);
+				try {
+					if (Objects.isNull(AvanzarBarra1) || !AvanzarBarra1.isAlive()) {
+						AvanzarBarra1 = new Avanzar(pbAvance1);
+						AvanzarBarra1.start();
+					} else {
+						JOptionPane.showMessageDialog(Panel.this,
+								"El proceso \"Barra 1\" ya está en ejecución");
+					}
+				} catch (IllegalThreadStateException ex) {
+					AvanzarBarra1 = null;
+					System.out.println("Error al crear barra1: " + ex.getMessage());
 				}
 			}
 		});
@@ -91,17 +94,17 @@ public class Panel extends JFrame {
 		btnAvanzar2 = new JButton("Avanzar");
 		btnAvanzar2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Thread AvanzarBarra2 = new Avanzar(pbAvance2);
-				AvanzarBarra2.start();
-				btnAvanzar2.setEnabled(false);
-				btnALaVez.setEnabled(false);
-				
-				if (AvanzarBarra2.isAlive()) {
-					btnAvanzar2.setEnabled(false);
-					btnALaVez.setEnabled(false);
-				} else {
-					btnAvanzar2.setEnabled(true);
-					btnALaVez.setEnabled(true);
+				try {
+					if (Objects.isNull(AvanzarBarra2) || !AvanzarBarra2.isAlive()) {
+						AvanzarBarra2 = new Avanzar(pbAvance2);
+						AvanzarBarra2.start();
+					} else {
+						JOptionPane.showMessageDialog(Panel.this,
+								"El proceso \"Barra 2\" ya está en ejecución");
+					}
+				} catch (IllegalThreadStateException ex) {
+					AvanzarBarra2 = null;
+					System.out.println("Error al crear barra2: " + ex.getMessage());
 				}
 			}
 		});
@@ -111,15 +114,12 @@ public class Panel extends JFrame {
 		pbAvance1 = new JProgressBar();
 		pbAvance1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Random random = new Random();
+				cambiarColor(pbAvance1);
 				
-				int max = 256; // Rango [0, 256)
-				
-				int red = random.nextInt(max);
-				int green = random.nextInt(max);
-				int blue = random.nextInt(max);
-
-				pbAvance1.setForeground(new Color(red, green, blue));
+				if (pbAvance1.getValue() == BarraProgreso.MAX) {
+					JOptionPane.showMessageDialog(Panel.this,
+							"El proceso 1 ha finalizado");
+				}
 			}
 		});
 		pbAvance1.setBounds(109, 11, 446, 36);
@@ -128,15 +128,12 @@ public class Panel extends JFrame {
 		pbAvance2 = new JProgressBar();
 		pbAvance2.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Random random = new Random();
+				cambiarColor(pbAvance2);
 				
-				int max = 256; // Rango [0, 256)
-				
-				int red = random.nextInt(max);
-				int green = random.nextInt(max);
-				int blue = random.nextInt(max);
-				
-				pbAvance2.setForeground(new Color(red, green, blue));
+				if (pbAvance2.getValue() == BarraProgreso.MAX) {
+					JOptionPane.showMessageDialog(Panel.this,
+							"El proceso 2 ha finalizado");
+				}
 			}
 		});
 		pbAvance2.setBounds(109, 85, 446, 36);
@@ -145,24 +142,39 @@ public class Panel extends JFrame {
 		btnALaVez = new JButton("A la vez");
 		btnALaVez.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Thread AvanzarBarra1 = new Avanzar(pbAvance1);
-				Thread AvanzarBarra2 = new Avanzar(pbAvance2);
-				
-				AvanzarBarra1.start();
-				AvanzarBarra2.start();
-				
-				if (AvanzarBarra1.isAlive() && AvanzarBarra2.isAlive()) {
-					btnAvanzar1.setEnabled(false);
-					btnAvanzar2.setEnabled(false);
-					btnALaVez.setEnabled(false);
-				} else {
-					btnAvanzar1.setEnabled(true);
-					btnAvanzar2.setEnabled(true);
-					btnALaVez.setEnabled(true);
+				try {
+					if ((Objects.isNull(AvanzarBarra1) || !AvanzarBarra1.isAlive()) &&
+							(Objects.isNull(AvanzarBarra2) || !AvanzarBarra2.isAlive())) {
+						AvanzarBarra1 = new Avanzar(pbAvance1);
+						AvanzarBarra2 = new Avanzar(pbAvance2);
+						
+						AvanzarBarra1.start();
+						AvanzarBarra2.start();
+					} else {
+						JOptionPane.showMessageDialog(Panel.this,
+								"Ambos procesos ya está en ejecución");
+					}
+				} catch (IllegalThreadStateException ex) {
+					AvanzarBarra1 = null;
+					AvanzarBarra2 = null;
+					System.out.println("Error al crear ambas barras: " + ex.getMessage());
 				}
 			}
 		});
 		btnALaVez.setBounds(10, 152, 89, 36);
 		contentPane.add(btnALaVez);
+	}
+	
+	// Cambiar el color de una barra de progreso
+	private void cambiarColor(JProgressBar jpb) {
+		Random random = new Random();
+		
+		int max = 256; // Rango [0, 256)
+		
+		int red = random.nextInt(max);
+		int green = random.nextInt(max);
+		int blue = random.nextInt(max);
+		
+		jpb.setForeground(new Color(red, green, blue));
 	}
 }

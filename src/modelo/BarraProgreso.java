@@ -1,8 +1,8 @@
 package modelo;
 
 public class BarraProgreso {
-	private static final int MIN = 0;
-	private static final int MAX = 100;
+	public static final int MIN = 0;
+	public static final int MAX = 100;
 	
 	private String nombre;
 	private int min;
